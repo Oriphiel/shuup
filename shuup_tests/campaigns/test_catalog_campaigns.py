@@ -443,7 +443,7 @@ def test_product_catalog_campaigns():
     shop1 = Shop.objects.create(name="testshop", identifier="testshop", status=ShopStatus.ENABLED, public_name="testshop")
     sp = ShopProduct.objects.create(product=product, shop=shop1, default_price=shop1.create_price(200))
 
-    assert product.get_shop_instance(shop1) == sp
+    assert product.get_shop_instance(shop1).pk == sp.pk
 
     campaign2 = CatalogCampaign.objects.create(shop=shop1, name="test1", active=True)
     cat_filter2 = CategoryFilter.objects.create()

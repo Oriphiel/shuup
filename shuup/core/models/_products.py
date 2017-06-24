@@ -373,6 +373,8 @@ class Product(TaxableItem, AttributableMixin, TranslatableModel):
         except ObjectDoesNotExist:
             return self.sku
 
+    _shop_inst = None
+
     def get_shop_instance(self, shop, allow_cache=False):
         """
         :type shop: shuup.core.models.Shop
@@ -382,7 +384,10 @@ class Product(TaxableItem, AttributableMixin, TranslatableModel):
             identifier="shop_product", item=self, context={"shop": shop}, allow_cache=allow_cache)
         if val is not None:
             return val
+        if self._shop_inst and self._shop_inst.shop.id == shop.id:
+            return self._shop_inst
         shop_inst = self.shop_products.get(shop_id=shop.id)
+        self._shop_inst = shop_inst
         context_cache.set_cached_value(key, shop_inst)
         return shop_inst
 
