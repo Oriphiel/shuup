@@ -160,9 +160,12 @@ class CatalogCampaign(Campaign):
     @classmethod
     def get_matching(cls, context, shop_product):
         prod_ctx_cache_elements = dict(
-            customer=context.customer.pk or 0,
             shop=context.shop.pk,
             product_id=shop_product.pk)
+        from shuup.campaigns.models import ContextCondition
+        if ContextCondition.objects.count():
+            prod_ctx_cache_elements["customer"] = context.customer.pk or 0
+
         namespace = CAMPAIGNS_CACHE_NAMESPACE
         key = "%s:%s" % (namespace, hash(frozenset(prod_ctx_cache_elements.items())))
         cached_matching = cache.get(key, None)
