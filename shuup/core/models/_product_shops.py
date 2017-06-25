@@ -413,8 +413,12 @@ class ShopProduct(MoneyPropped, TranslatableModel):
             raise ProductNotVisibleProblem(message.args[0])
 
     def is_orderable(self, supplier, customer, quantity, allow_cache=True):
+        cache_context = {}
+        if self.visibility_limit != ProductVisibility.VISIBLE_TO_ALL:
+            cache_context["customer"] = customer
+
         key, val = context_cache.get_cached_value(
-            identifier="is_orderable", item=self, context={"customer": customer},
+            identifier="is_orderable", item=self, context=cache_context,
             supplier=supplier, quantity=quantity, allow_cache=allow_cache)
         if customer and val is not None:
             return val
